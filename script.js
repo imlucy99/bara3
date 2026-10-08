@@ -19,6 +19,11 @@ const CY = 200;
 const R_OUTER = 184;
 const START_ANGLE = 166;   // posisi angka 0 (derajat, searah jarum jam dari kanan)
 const SWEEP = 208;         // total sudut dari 0 sampai maxSpeed
+// Geometri gauge RPM kecil (viewBox 170 x 170)
+const RCX = 85;
+const RCY = 85;
+const RPM_START = 150;   // sudut angka 0
+const RPM_SWEEP = 240;   // total sudut 0 sampai rpmMax
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // Inisialisasi Element DOM
@@ -98,20 +103,29 @@ function buildDial() {
     }
     ticks.insertBefore(minorFrag, ticks.firstChild);
 
-    // Skala RPM (ticks + angka kecil di dalam dial)
-    const R_RPM = R_OUTER - 66;
+    // Gauge RPM kecil: ring, ticks, angka
+    const rp = (r, deg) => {
+        const a = deg * Math.PI / 180;
+        return [RCX + r * Math.cos(a), RCY + r * Math.sin(a)];
+    };
+    const [rx1, ry1] = rp(78, RPM_START);
+    const [rx2, ry2] = rp(78, RPM_START + RPM_SWEEP);
+    rpmScale.appendChild(svgEl('path', {
+        d: `M${rx1.toFixed(2)} ${ry1.toFixed(2)} A78 78 0 1 1 ${rx2.toFixed(2)} ${ry2.toFixed(2)}`,
+        class: 'ring-line'
+    }));
     for (let r = 0; r <= CONFIG.rpmMax; r += 0.5) {
-        const angle = START_ANGLE + (r / CONFIG.rpmMax) * SWEEP;
+        const angle = RPM_START + (r / CONFIG.rpmMax) * RPM_SWEEP;
         const major = Number.isInteger(r);
         const red = r / CONFIG.rpmMax >= CONFIG.redline;
-        const [x1, y1] = polar(R_RPM, angle);
-        const [x2, y2] = polar(R_RPM - (major ? 11 : 6), angle);
+        const [x1, y1] = rp(72, angle);
+        const [x2, y2] = rp(major ? 61 : 66, angle);
         rpmScale.appendChild(svgEl('line', {
             x1: x1.toFixed(2), y1: y1.toFixed(2), x2: x2.toFixed(2), y2: y2.toFixed(2),
             class: 'rpm-tick' + (major ? ' major' : '') + (red ? ' red' : '')
         }));
         if (major) {
-            const [lx, ly] = polar(R_RPM - 23, angle);
+            const [lx, ly] = rp(48, angle);
             const t = svgEl('text', { x: lx.toFixed(2), y: ly.toFixed(2), class: 'rpm-num' + (red ? ' red' : '') });
             t.textContent = r;
             rpmScale.appendChild(t);
@@ -127,8 +141,8 @@ buildDial();
 // ===================== ANIMASI JARUM =====================
 let needleTarget = START_ANGLE;
 let needleCurrent = START_ANGLE;
-let rpmTarget = START_ANGLE;
-let rpmCurrent = START_ANGLE;
+let rpmTarget = RPM_START;
+let rpmCurrent = RPM_START;
 
 function renderNeedle() {
     needleCurrent += (needleTarget - needleCurrent) * 0.2;
@@ -137,7 +151,7 @@ function renderNeedle() {
 
     rpmCurrent += (rpmTarget - rpmCurrent) * 0.25;
     if (Math.abs(rpmTarget - rpmCurrent) < 0.01) rpmCurrent = rpmTarget;
-    elRpmNeedle.setAttribute('transform', `translate(${CX} ${CY}) rotate(${rpmCurrent.toFixed(2)})`);
+    elRpmNeedle.setAttribute('transform', `translate(${RCX} ${RCY}) rotate(${rpmCurrent.toFixed(2)})`);
     requestAnimationFrame(renderNeedle);
 }
 requestAnimationFrame(renderNeedle);
@@ -181,7 +195,7 @@ window.setSpeed = function(speed) {
 // 2. RPM Arc (0.0 - 1.0)
 window.setRPM = function(rpm) {
     const val = Math.max(0, Math.min(1, Number(rpm || 0)));
-    rpmTarget = START_ANGLE + val * SWEEP;
+    rpmTarget = RPM_START + val * RPM_SWEEP;
     elRpmNeedle.classList.toggle('red', val >= CONFIG.redline);
 };
 

@@ -417,3 +417,20 @@ html.preview .hud {
 #rpm-needle.red path {
     fill: #ff3b2f;
 }
+
+/* GAUGE RPM KECIL */
+.rpm-dial {
+    position: absolute;
+    left: -168px;
+    top: 180px;
+    width: 160px;
+    height: 160px;
+    overflow: visible;
+}
+
+.rpm-unit {
+    fill: rgba(255, 255, 255, 0.45);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-anchor: middle;
+}

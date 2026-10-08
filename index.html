@@ -52,12 +52,6 @@
       <g id="ring"></g>
       <g id="ticks"></g>
       <g id="labels"></g>
-      <g id="rpm-scale"></g>
-
-      <!-- Jarum RPM (pendek) -->
-      <g id="rpm-needle">
-        <path d="M-14 -2.4 L106 -0.9 L110 0 L106 0.9 L-14 2.4 Z" />
-      </g>
 
       <!-- Jarum Speed -->
       <g id="needle" filter="url(#glow)">
@@ -65,6 +59,23 @@
       </g>
       <circle class="hub" cx="200" cy="200" r="15" fill="url(#hub-grad)" />
       <circle class="hub-ring" cx="200" cy="200" r="15" />
+    </svg>
+
+    <!-- GAUGE RPM KECIL (di sebelah kiri dial utama) -->
+    <svg id="rpm-dial" class="rpm-dial" viewBox="0 0 170 170" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="rpm-clip"><circle cx="85" cy="85" r="82" /></clipPath>
+      </defs>
+      <circle class="face" cx="85" cy="85" r="82" />
+      <image href="background.jpg" x="3" y="3" width="164" height="164" preserveAspectRatio="xMidYMid slice" clip-path="url(#rpm-clip)" />
+      <circle class="face-shade" cx="85" cy="85" r="82" />
+      <g id="rpm-scale"></g>
+      <text x="85" y="128" class="rpm-unit">x1000 r/min</text>
+      <g id="rpm-needle" filter="url(#glow)">
+        <path d="M-10 -2.2 L62 -0.8 L67 0 L62 0.8 L-10 2.2 Z" />
+      </g>
+      <circle cx="85" cy="85" r="9" fill="url(#hub-grad)" />
+      <circle class="hub-ring" cx="85" cy="85" r="9" />
     </svg>
 
     <!-- READOUT DIGITAL TENGAH -->
@@ -84,7 +95,6 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 4l8 8-8 8v-5H2V9h12z"/></svg>
       </div>
     </div>
-    <div class="rpm-label">x1000 r/min</div>
 
     <!-- PANEL LCD BAWAH -->
     <div class="lcd">
