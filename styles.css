@@ -1,0 +1,419 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Ubah --hud-scale untuk memperbesar / memperkecil HUD di dalam game */
+    --hud-scale: 0.85;
+    --orange: #ff7a1a;
+    --orange-hot: #ffb15c;
+    --white: #f5f3ef;
+    --lcd-on: #e9f1ff;
+    --lcd-off: rgba(233, 241, 255, 0.07);
+    --off: rgba(255, 255, 255, 0.16);
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    background: transparent !important;
+    background-color: transparent !important;
+    overflow: hidden !important;
+    font-family: 'Arial Narrow', 'Roboto Condensed', 'Segoe UI', Arial, sans-serif;
+    color: var(--white);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    user-select: none;
+}
+
+/* Mode preview (dipakai oleh halaman demo) */
+html.preview body {
+    justify-content: center;
+    align-items: center;
+}
+
+/* KONTAINER HUD UTAMA (400 x 340 lalu di-scale) */
+.hud {
+    position: relative;
+    width: 400px;
+    height: 340px;
+    margin: 18px;
+    flex-shrink: 0;
+    transform: scale(var(--hud-scale));
+    transform-origin: bottom right;
+}
+
+html.preview .hud {
+    transform-origin: center;
+}
+
+/* DIAL SVG */
+.dial {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.face {
+    fill: url(#face-grad);
+    fill-opacity: 0.93;
+    stroke: rgba(255, 255, 255, 0.07);
+    stroke-width: 1.5;
+}
+
+.ring-line {
+    fill: none;
+    stroke: var(--orange);
+    stroke-width: 2.4;
+}
+
+.tick-minor {
+    stroke: var(--orange);
+    stroke-width: 1.4;
+}
+
+.tick-mid {
+    stroke: var(--white);
+    stroke-width: 3;
+}
+
+.tick-major {
+    stroke: var(--white);
+    stroke-width: 6;
+}
+
+.tick-label {
+    fill: var(--white);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.tick-major.over,
+.tick-mid.over {
+    stroke: #ff3b2f;
+}
+
+/* RPM ARC */
+.rpm-seg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.09);
+    stroke-width: 6;
+    transition: stroke 0.08s linear;
+}
+
+.rpm-seg.active {
+    stroke: var(--orange);
+}
+
+.rpm-seg.red {
+    stroke: rgba(255, 59, 47, 0.28);
+}
+
+.rpm-seg.red.active {
+    stroke: #ff3b2f;
+}
+
+.hub-ring {
+    fill: none;
+    stroke: rgba(255, 140, 50, 0.55);
+    stroke-width: 1.5;
+}
+
+/* READOUT DIGITAL */
+.readout {
+    position: absolute;
+    top: 110px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.readout-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.speed-text {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 40px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+
+.speed-text .dim {
+    color: rgba(255, 255, 255, 0.13);
+}
+
+.speed-text .bright {
+    color: var(--white);
+}
+
+.speed-unit {
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--orange);
+}
+
+.rpm-label {
+    position: absolute;
+    top: 174px;
+    width: 100%;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* LAMPU SEIN */
+.signal {
+    width: 22px;
+    height: 22px;
+    color: var(--off);
+}
+
+.signal svg {
+    width: 100%;
+    height: 100%;
+}
+
+.signal.active {
+    color: #20e070;
+    animation: blink 0.9s steps(1, end) infinite;
+}
+
+@keyframes blink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.12; }
+}
+
+/* PANEL LCD */
+.lcd {
+    position: absolute;
+    top: 234px;
+    left: 98px;
+    width: 204px;
+    height: 64px;
+    padding: 5px 9px;
+    background: linear-gradient(180deg, #0d1014 0%, #06080a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.lcd-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lcd-cell {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.lcd-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--lcd-on);
+    opacity: 0.75;
+    align-self: flex-start;
+}
+
+.lcd-unit {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--lcd-on);
+    opacity: 0.75;
+}
+
+/* Efek 7-segment: angka "8" redup di belakang nilai */
+.seg-wrap {
+    position: relative;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+}
+
+.seg-ghost {
+    color: var(--lcd-off);
+}
+
+.seg-value {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: var(--lcd-on);
+    white-space: nowrap;
+}
+
+/* BAR BENSIN & ENGINE */
+.lcd-bars {
+    gap: 8px;
+}
+
+.bar-group {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.bar-icon {
+    width: 12px;
+    height: 12px;
+    color: rgba(233, 241, 255, 0.6);
+    display: flex;
+    transition: color 0.2s ease;
+}
+
+.bar-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.bar-end {
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(233, 241, 255, 0.5);
+}
+
+.bar-segs {
+    display: flex;
+    gap: 1.5px;
+}
+
+.f-seg, .h-seg {
+    display: block;
+    width: 4px;
+    height: 9px;
+    background: var(--lcd-off);
+    transform: skewX(-12deg);
+}
+
+.f-seg.active, .h-seg.active {
+    background: var(--lcd-on);
+}
+
+#fuel-segments.low .f-seg.active {
+    background: #ff9100;
+}
+
+#engine-icon.active-warn {
+    color: #ff9100;
+}
+
+#engine-icon.active-danger {
+    color: #ff3333;
+}
+
+#engine-icon.active-warn + .bar-segs .h-seg.active {
+    background: #ff9100;
+}
+
+#engine-icon.active-danger + .bar-segs .h-seg.active {
+    background: #ff3333;
+}
+
+/* INDIKATOR BAWAH */
+.bottom-indicators {
+    position: absolute;
+    top: 304px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+}
+
+.icon-item {
+    width: 20px;
+    height: 20px;
+    color: var(--off);
+    transition: color 0.15s ease;
+}
+
+.icon-item svg {
+    width: 100%;
+    height: 100%;
+}
+
+.icon-item.active {
+    color: #20e070;
+}
+
+.icon-item.high-beam {
+    color: #3d8bff;
+}
+
+.icon-item.warn {
+    color: #ff3c3c;
+}
+
+.icon-item.locked {
+    color: #ffea00;
+}
+
+/* BACKGROUND FOTO DI DIAL */
+.face-shade {
+    fill: url(#face-grad);
+    fill-opacity: 0.6;
+    stroke: rgba(255, 255, 255, 0.12);
+    stroke-width: 1.5;
+}
+
+/* SKALA & JARUM RPM */
+.rpm-tick {
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 1.4;
+}
+
+.rpm-tick.major {
+    stroke: var(--white);
+    stroke-width: 2.4;
+}
+
+.rpm-tick.red {
+    stroke: #ff3b2f;
+}
+
+.rpm-num {
+    fill: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.rpm-num.red {
+    fill: #ff3b2f;
+}
+
+#rpm-needle path {
+    fill: var(--white);
+    transition: fill 0.1s linear;
+}
+
+#rpm-needle.red path {
+    fill: #ff3b2f;
+}
